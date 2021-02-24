@@ -17,6 +17,8 @@ import BtnEdit from '../../objects/BtnEdit';
 import BtnDelete from '../../objects/BtnDelete';
 import BtnLoadMore from '../../objects/BtnLoadMore';
 import ConfirmAlert from '../../objects/ConfirmAlert';
+import Spinner from '../../objects/Spinner';
+
 import { IoIosArrowDropdown } from 'react-icons/io';
 
 import { Container, Posts } from './styles';
@@ -31,6 +33,7 @@ export default function UserConfig() {
   const [postImg, setPostImg] = useState();
   const [postCounter, setPostCounter] = useState(10);
   const [loadPosts, setLoadPosts] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [open, setOpen] = useState(false);
   const [writerPosts, setWriterPosts] = useState([]);
@@ -66,13 +69,15 @@ export default function UserConfig() {
   const fetchWriterPost = async () => {
     try {
       const res = await api.get('/api/writer/posts');
-      if (res.data.length > postCounter) {
-        setLoadPosts(true);
-      } else {
-        setLoadPosts(false);
-      }
-
+      
       const filter = res.data.filter((post, i) => {
+        if (i >= postCounter) {
+          setLoadPosts(true);
+        } else {
+          setLoadPosts(false);
+          setLoading(false);
+        }
+
         return i < postCounter;
       });
 
@@ -86,6 +91,11 @@ export default function UserConfig() {
     setOpenAlert(true);
     setPostId(id);
     setPostImg(img);
+  };
+
+  const handleLoadPosts = () => {
+    setPostCounter((postCounter) => postCounter + 10);
+    setLoading(true);
   };
 
   const deletePost = async () => {
@@ -192,11 +202,15 @@ export default function UserConfig() {
         ))}
       </Posts>
 
-      {loadPosts && open ? (
-        <BtnLoadMore
-          onClick={() => setPostCounter((postCounter) => postCounter + 10)}
-        >
-          <IoIosArrowDropdown /> Ver mais postagens
+      {loadPosts && open === 'posts' ? (
+        <BtnLoadMore onClick={handleLoadPosts}>
+          {loading ? (
+            <Spinner load={loading} />
+          ) : (
+            <>
+              <IoIosArrowDropdown /> Ver mais postagens
+            </>
+          )}
         </BtnLoadMore>
       ) : (
         ''

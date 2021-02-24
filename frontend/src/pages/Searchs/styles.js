@@ -18,7 +18,7 @@ export const SearchsContainer = styled.div`
   }
 
   > article {
-    margin-bottom: 20px 0;
+    margin-bottom: var(--medium);
     display: flex;
     align-items: center;
 

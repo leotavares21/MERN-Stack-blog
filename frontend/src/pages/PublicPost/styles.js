@@ -29,6 +29,7 @@ export const Container = styled.div`
 
 export const Post = styled.article`
   ${sizeWrapperContainer};
+  padding: 0 7px;
 
   > div {
     display: flex;
@@ -98,7 +99,6 @@ export const Post = styled.article`
   > p {
     margin: 20px 0;
     text-align: justify;
-    padding: 0 5px;
   }
 
   > ul {

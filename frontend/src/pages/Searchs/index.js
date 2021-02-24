@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import BtnLoadMore from '../../objects/BtnLoadMore';
+import Spinner from '../../objects/Spinner';
 import {
   SearchsContainer,
   ContentPost,
@@ -15,6 +16,7 @@ export default function Searchs() {
   const [loadPosts, setLoadPosts] = useState(false);
   const [postCounter, setPostCounter] = useState(10);
   const [filteredPosts, setFilteredPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
   const history = useHistory();
   const search = history.location.state.search;
 
@@ -28,11 +30,17 @@ export default function Searchs() {
         setLoadPosts(true);
       } else {
         setLoadPosts(false);
+        setLoading(false);
       }
 
       return i < postCounter;
     });
     setFilteredPosts(filterPosts);
+  };
+
+  const handleLoadPosts = () => {
+    setPostCounter((postCounter) => postCounter + 10);
+    setLoading(true);
   };
 
   return (
@@ -71,14 +79,18 @@ export default function Searchs() {
       )}
 
       {loadPosts ? (
-        <BtnLoadMore
-          onClick={() => setPostCounter((postCounter) => postCounter + 10)}
-        >
-          <IoIosArrowDropdown /> Ver mais postagens
-        </BtnLoadMore>
-      ) : (
-        ''
-      )}
+          <BtnLoadMore onClick={handleLoadPosts}>
+            {loading ? (
+              <Spinner load={loading} />
+            ) : (
+              <>
+                <IoIosArrowDropdown /> Ver mais postagens
+              </>
+            )}
+          </BtnLoadMore>
+        ) : (
+          ''
+        )}
     </SearchsContainer>
   );
 }

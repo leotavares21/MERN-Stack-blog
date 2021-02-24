@@ -14,6 +14,7 @@ import {
 
 import BtnForm from '../../objects/BtnForm';
 import BtnLoadMore from '../../objects/BtnLoadMore';
+import Spinner from '../../objects/Spinner';
 
 import {
   Container,
@@ -49,6 +50,7 @@ export default function PublicPost() {
   const [editing, setEditing] = useState(false);
   const [showOptions, setShowOptions] = useState('');
   const [loadComments, setLoadComments] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [commentCounter, setCommentCounter] = useState(10);
   const replyRef = useRef([]);
   const btnReplyRef = useRef([]);
@@ -63,13 +65,14 @@ export default function PublicPost() {
     const resPosts = await api.get('/api/random/posts');
     const resSlug = await api.get(`/api/post/${slug}`);
     const comment = await api.get(`/api/comment/${resSlug.data._id}`);
-    if (comment.data.length > 10) {
-      setLoadComments(!loadComments);
-    }
-    if (comment.data.length < commentCounter) {
-      setLoadComments(false);
-    }
     const lastestComments = comment.data.filter((comm, i) => {
+      if (i >= commentCounter) {
+        setLoadComments(true);
+      } else {
+        setLoadComments(false);
+        setLoading(false);
+      }
+
       return i < commentCounter;
     });
     replyRef.current = new Array(comment.data.length);
@@ -77,6 +80,7 @@ export default function PublicPost() {
     setComments(lastestComments);
     setPost(resSlug.data);
     setPosts(resPosts.data);
+
   };
 
   const createComment = async (e) => {
@@ -225,6 +229,11 @@ export default function PublicPost() {
     } else {
       console.log('Share not supported');
     }
+  };
+
+  const handleLoadComments = () => {
+    setCommentCounter((commentCounter) => commentCounter + 10);
+    setLoading(true);
   };
 
   return (
@@ -498,16 +507,19 @@ export default function PublicPost() {
             </ReplyContent>
           </CommentList>
         ))}
+
         {loadComments ? (
-          <BtnLoadMore
-            onClick={() =>
-              setCommentCounter((commentCounter) => commentCounter + 10)
-            }
-          >
-            <IoIosArrowDropdown /> Ver mais comentários
+          <BtnLoadMore onClick={handleLoadComments}>
+            {loading ? (
+              <Spinner load={loading} />
+            ) : (
+              <>
+                <IoIosArrowDropdown /> Ver mais comentários
+              </>
+            )}
           </BtnLoadMore>
         ) : (
-          ''
+        ''
         )}
       </section>
 

@@ -84,7 +84,7 @@ export const PostList = styled.div`
   > article {
     display: flex;
     align-items: center;
-    margin: 30px 0;
+    margin: 30px 0 60px 0;
 
     @media (max-width: 610px) {
       flex-direction: column;

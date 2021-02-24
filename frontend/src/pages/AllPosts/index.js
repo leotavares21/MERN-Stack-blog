@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import BtnLoadMore from '../../objects/BtnLoadMore';
+import Spinner from '../../objects/Spinner';
 import { UserContext } from '../../context/UserContext';
 import { PostsContainer, ContentPost, Category, PostDate } from './styles';
 import { format, parseISO } from 'date-fns';
@@ -11,6 +12,7 @@ export default function AllPosts() {
   const [loadPosts, setLoadPosts] = useState(false);
   const [postCounter, setPostCounter] = useState(10);
   const [filteredPosts, setFilteredPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { posts } = useContext(UserContext);
   const history = useHistory();
 
@@ -24,11 +26,17 @@ export default function AllPosts() {
         setLoadPosts(true);
       } else {
         setLoadPosts(false);
+        setLoading(false);
       }
 
       return i < postCounter;
     });
     setFilteredPosts(filterPosts);
+  };
+
+  const handleLoadPosts = () => {
+    setPostCounter((postCounter) => postCounter + 10);
+    setLoading(true);
   };
 
   return (
@@ -59,10 +67,14 @@ export default function AllPosts() {
       ))}
 
       {loadPosts ? (
-        <BtnLoadMore
-          onClick={() => setPostCounter((postCounter) => postCounter + 10)}
-        >
-          <IoIosArrowDropdown /> Ver mais postagens
+        <BtnLoadMore onClick={handleLoadPosts}>
+          {loading ? (
+            <Spinner load={loading} />
+          ) : (
+            <>
+              <IoIosArrowDropdown /> Ver mais postagens
+            </>
+          )}
         </BtnLoadMore>
       ) : (
         ''

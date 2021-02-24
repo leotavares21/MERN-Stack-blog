@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns';
 
 import api from '../../services/api';
 
+import Spinner from '../../objects/Spinner';
 import { Container, PostBanner, ArticleBanner, PostList } from './styles';
 import { IoIosArrowDropdown } from 'react-icons/io';
 
@@ -15,6 +16,7 @@ export default function PostsByCategory() {
   const [postCounter, setPostCounter] = useState(10);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [bannerPosts, setBannerPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getPostsByCategory(slug);
@@ -24,7 +26,6 @@ export default function PostsByCategory() {
     try {
       if (slug) {
         const res = await api.get(`/api/category/post/${slug}`);
-
         const banner = res.data.filter((post, i) => {
           return i < 2;
         });
@@ -33,6 +34,7 @@ export default function PostsByCategory() {
             setLoadPosts(true);
           } else {
             setLoadPosts(false);
+            setLoading(false);
           }
 
           return i < postCounter;
@@ -46,12 +48,18 @@ export default function PostsByCategory() {
     }
   };
 
+  const handleLoadPosts = () => {
+    setPostCounter((postCounter) => postCounter + 10);
+    setLoading(true);
+  };
+
   return (
     <Container>
       <h2>{slug}</h2>
       <PostBanner>
         {bannerPosts.map((post) => (
           <ArticleBanner
+            key={post._id}
             image={post.imageUrl}
             onClick={() =>
               history.push(`/postagem/${post.category.slug}/${post.slug}`)
@@ -65,7 +73,7 @@ export default function PostsByCategory() {
 
       <PostList>
         {filteredPosts.map((post) => (
-          <article>
+          <article key={post._id}>
             <div
               onClick={() =>
                 history.push(`/postagem/${post.category.slug}/${post.slug}`)
@@ -88,10 +96,14 @@ export default function PostsByCategory() {
         ))}
 
         {loadPosts ? (
-          <BtnLoadMore
-            onClick={() => setPostCounter((postCounter) => postCounter + 10)}
-          >
-            <IoIosArrowDropdown /> Ver mais postagens
+          <BtnLoadMore onClick={handleLoadPosts}>
+            {loading ? (
+              <Spinner load={loading} />
+            ) : (
+              <>
+                <IoIosArrowDropdown /> Ver mais postagens
+              </>
+            )}
           </BtnLoadMore>
         ) : (
           ''

@@ -15,6 +15,7 @@ import BtnDelete from '../../objects/BtnDelete';
 import BtnEdit from '../../objects/BtnEdit';
 import BtnLoadMore from '../../objects/BtnLoadMore';
 import ConfirmAlert from '../../objects/ConfirmAlert';
+import Spinner from '../../objects/Spinner';
 import { IoIosArrowDropdown } from 'react-icons/io';
 import { Container, Post, Favorite, NotFavorite, FavContainer } from './styles';
 
@@ -25,6 +26,7 @@ export default function PostsAdmin() {
   const [postId, setPostId] = useState();
   const [postImg, setPostImg] = useState();
   const [loadPosts, setLoadPosts] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [postCounter, setPostCounter] = useState(10);
   const [favText, setFavText] = useState('');
   const favRef = useRef();
@@ -51,6 +53,7 @@ export default function PostsAdmin() {
       setLoadPosts(true);
     } else {
       setLoadPosts(false);
+      setLoading(false);
     }
 
     const filter = res.data.filter((post, i) => {
@@ -79,6 +82,11 @@ export default function PostsAdmin() {
     } catch (err) {
       ToastsStore.error(err.response.data.error);
     }
+  };
+
+  const handleLoadPosts = () => {
+    setPostCounter((postCounter) => postCounter + 10);
+    setLoading(true);
   };
 
   return (
@@ -147,10 +155,14 @@ export default function PostsAdmin() {
       ))}
 
       {loadPosts ? (
-        <BtnLoadMore
-          onClick={() => setPostCounter((postCounter) => postCounter + 10)}
-        >
-          <IoIosArrowDropdown /> Ver mais postagens
+        <BtnLoadMore onClick={handleLoadPosts}>
+          {loading ? (
+            <Spinner load={loading} />
+          ) : (
+            <>
+              <IoIosArrowDropdown /> Ver mais postagens
+            </>
+          )}
         </BtnLoadMore>
       ) : (
         ''

@@ -118,7 +118,7 @@ export default function Navbar() {
       <Nav menuOpened={menuOpened}>
         <div>
           <Link to="/">
-            <h1>Blog</h1>
+            <h1>MERN</h1>
           </Link>
           <NavList menuOpened={menuOpened}>
             <li>
